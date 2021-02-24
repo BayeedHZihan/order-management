@@ -45,7 +45,6 @@ app.get('/users', (req, res) => {
 
 
 app.post('/users', (req, res)=>{
-  console.log("this is the request body: ", req.body);
   const user = new User(req.body);
   user.save()
       .then(result => {
@@ -59,18 +58,29 @@ app.post('/users', (req, res)=>{
 
 app.delete('/users/:id', (req, res) => {
   const id = req.params.id;
-  console.log("the id is: ", id);
 
   User.findByIdAndDelete(id)
   .then(result =>{
       res.json(result);
-      //console.log("server is getting the delete request")
   })
   .catch(err => {
     res.status(400).send(err);
-    console.log(err);
   });
 })
+
+
+app.patch('/users/:id', (req, res) => {
+  User.findByIdAndUpdate(req.params.id, req.body, {new: true})
+    .then(result => {
+      if (!result) {
+        return res.status(404).send();
+      }
+      res.send(result);
+    })
+    .catch(err => res.status(500). send(err));
+})
+
+
 
 
 
