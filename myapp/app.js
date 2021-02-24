@@ -5,8 +5,11 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
+const bodyParser = require('body-parser');
+const User = require('./models/user');
+
 const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
+//const usersRouter = require('./routes/users');
 
 const app = express();
 
@@ -22,14 +25,34 @@ mongoose.connect(dbURI, {useNewUrlParser:true, useUnifiedTopology:true})
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use(logger('dev'));
-app.use(express.json());
+//app.use(logger('dev'));
+//app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+//app.use(cookieParser());
+//app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.json());
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+//app.use('/users', usersRouter);
+
+
+
+app.get('/users', (req, res) => {
+  User.find()
+    .then((result) => res.json(result))
+    .catch(err => console.log(err));
+})
+
+
+
+
+
+
+
+
+
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
