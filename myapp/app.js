@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 const User = require('./models/user');
 
 const indexRouter = require('./routes/index');
@@ -26,15 +27,23 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 //app.use(logger('dev'));
-//app.use(express.json());
+app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-//app.use(cookieParser());
+app.use(cookieParser());
 //app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 
 app.use('/', indexRouter);
 //app.use('/users', usersRouter);
 
+
+// create json web token
+const maxAge = 3 * 24 * 60 * 60;
+const createToken = (id) => {
+  return jwt.sign({ id }, 'a warm cup of tea in a warm afternoon', {
+    expiresIn: maxAge
+  });
+};
 
 
 app.get('/users', (req, res) => {
@@ -81,7 +90,16 @@ app.patch('/users/:id', (req, res) => {
 })
 
 
-
+app.post('/login', (req, res) => {
+  const {email, password} = req.body;
+  User.login(email, password)
+    .then((user) => {
+      const token = createToken(user._id);
+      res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge*1000});
+      res.status(200).json({user: user._id})
+    })
+    .catch(err => res.status(401).send(err));
+})
 
 
 
