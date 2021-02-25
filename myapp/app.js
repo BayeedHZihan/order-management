@@ -46,7 +46,62 @@ const createToken = (id) => {
 };
 
 
-app.get('/users', (req, res) => {
+const requireAuthUser = (req, res, next) => {
+  const token = req.cookies.jwt;
+  if (token){
+    jwt.verify(token, 'a warm cup of tea in a warm afternoon', async (err, decodedToken) => {
+      if (err){
+        console.log("error hase been made");
+      }
+      else {
+        let user = await User.findById(decodedToken.id);
+        //console.log(user.role);
+        if (user.role === 'user') {
+          next();
+        }
+      }
+    })
+  }
+}
+
+const requireAuthAdmin = (req, res, next) => {
+  const token = req.cookies.jwt;
+  if (token){
+    jwt.verify(token, 'a warm cup of tea in a warm afternoon', async (err, decodedToken) => {
+      if (err){
+        console.log("error hase been made");
+      }
+      else {
+        let user = await User.findById(decodedToken.id);
+        //console.log(user.role);
+        if (user.role === 'admin') {
+          next();
+        }
+      }
+    })
+  }
+}
+
+const requireAuthSuperAdmin = (req, res, next) => {
+  const token = req.cookies.jwt;
+  if (token){
+    jwt.verify(token, 'a warm cup of tea in a warm afternoon', async (err, decodedToken) => {
+      if (err){
+        console.log("error hase been made");
+      }
+      else {
+        let user = await User.findById(decodedToken.id);
+        //console.log(user.role);
+        if (user.role === 'super admin') {
+          next();
+        }
+      }
+    })
+  }
+}
+
+
+app.get('/users', requireAuthUser, (req, res) => {
   User.find()
     .then((result) => res.json(result))
     .catch(err => console.log(err));
