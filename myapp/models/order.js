@@ -15,7 +15,8 @@ const orderSchema = new Schema({
     },
     status: {
         type : String,
-        default : 'pending'
+        default : 'pending',
+        enum : ['pending']
     }
 }, {timestamps: true});
 
