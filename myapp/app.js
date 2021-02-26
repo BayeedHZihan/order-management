@@ -8,6 +8,7 @@ const logger = require('morgan');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const User = require('./models/user');
+const Product = require('./models/product');
 
 const indexRouter = require('./routes/index');
 //const usersRouter = require('./routes/users');
@@ -155,6 +156,32 @@ app.post('/login', (req, res) => {
     })
     .catch(err => res.status(401).send(err));
 })
+
+
+
+
+// Products CRUD
+app.get('/products', (req, res) => {
+  Product.find()
+    .then(result => res.json(result))
+    .catch(err => console.log(err));
+})
+
+app.post('/products', (req, res)=>{
+  const product = new Product(req.body);
+  product.save()
+      .then(result => {
+          res.json(result);
+          console.log(result);
+      })
+      .catch(err => {
+        res.status(400).send(err);
+      });
+})
+
+
+
+
 
 
 
