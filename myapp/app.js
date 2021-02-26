@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const User = require('./models/user');
 const Product = require('./models/product');
+const Order = require('./models/order');
 
 const indexRouter = require('./routes/index');
 //const usersRouter = require('./routes/users');
@@ -47,6 +48,8 @@ const createToken = (id) => {
 };
 
 
+
+// AUTH MIDDLEWARE
 const requireAuthUser = (req, res, next) => {
   const token = req.cookies.jwt;
   if (token){
@@ -102,6 +105,9 @@ const requireAuthSuperAdmin = (req, res, next) => {
 }
 
 
+
+
+// USERS SECTION
 app.get('/users', requireAuthUser, (req, res) => {
   User.find()
     .then((result) => res.json(result))
@@ -160,7 +166,7 @@ app.post('/login', (req, res) => {
 
 
 
-// Products CRUD
+// PRODUCTS SECTION
 app.get('/products', (req, res) => {
   Product.find()
     .then(result => res.json(result))
@@ -180,8 +186,16 @@ app.post('/products', (req, res)=>{
 })
 
 
-
-
+// ORDERS SECTION
+app.post('/orders', (req, res) => {
+  const order = new Order(req.body);
+  order.save()
+    .then(result => {
+      res.json(result);
+      console.log(result);
+    })
+    .catch(err => res.status(400).send(err));
+})
 
 
 
