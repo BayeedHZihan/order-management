@@ -63,9 +63,14 @@ const requireAuthUser = (req, res, next) => {
         //console.log(user.role);
         if (user.role === 'user') {
           next();
+        } else {
+          res.status(401).send("error");
         }
       }
     })
+  }
+  else {
+    res.status(401).send("error");
   }
 }
 
@@ -81,9 +86,14 @@ const requireAuthAdmin = (req, res, next) => {
         //console.log(user.role);
         if (user.role === 'admin') {
           next();
+        } else {
+          res.status(401).send("error");
         }
       }
     })
+  }
+  else {
+    res.status(401).send("error");
   }
 }
 
@@ -99,9 +109,14 @@ const requireAuthSuperAdmin = (req, res, next) => {
         //console.log(user.role);
         if (user.role === 'super admin') {
           next();
+        } else {
+          res.status(401).send("error");
         }
       }
     })
+  }
+  else {
+    res.status(401).send("error");
   }
 }
 
@@ -168,7 +183,7 @@ app.post('/login', (req, res) => {
 
 
 // PRODUCTS SECTION
-app.get('/products', (req, res) => {
+app.get('/products', requireAuthUser, (req, res) => {
   Product.find()
     .then(result => res.json(result))
     .catch(err => console.log(err));
@@ -187,7 +202,7 @@ app.post('/products', (req, res)=>{
 })
 
 
-app.get('/generate-products', (req, res) => {
+app.get('/generate-products', requireAuthSuperAdmin,(req, res) => {
   axios.get('https://fakestoreapi.com/products?limit=3')
     .then(result => {
       const resultData = result.data;
@@ -219,7 +234,7 @@ app.get('/generate-products', (req, res) => {
 
 
 // ORDERS SECTION
-app.post('/orders', (req, res) => {
+app.post('/orders', requireAuthUser, (req, res) => {
   const order = new Order(req.body);
   order.save()
     .then(result => {
@@ -229,7 +244,7 @@ app.post('/orders', (req, res) => {
     .catch(err => res.status(400).send(err));
 })
 
-app.patch('/orders/:id', (req, res) => {
+app.patch('/orders/:id', requireAuthAdmin, (req, res) => {
   const requestedKeysToUpdate = Object.keys(req.body);
   if (requestedKeysToUpdate.length!==1 || requestedKeysToUpdate[0]!=='status') {
     res.status(400).send("Bad Request");
@@ -245,7 +260,7 @@ app.patch('/orders/:id', (req, res) => {
     .catch(err => res.status(500).send(err));
 })
 
-app.get('/orders', (req, res) => {
+app.get('/orders', requireAuthSuperAdmin, (req, res) => {
   Order.find({createdAt:{ $gte : new Date(Date.now() - (24*60*60000))}})
   .then(result => {
     console.log(result);
