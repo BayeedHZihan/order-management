@@ -213,6 +213,15 @@ app.patch('/orders/:id', (req, res) => {
     .catch(err => res.status(500).send(err));
 })
 
+app.get('/orders', (req, res) => {
+  Order.find({createdAt:{ $gte : new Date(Date.now() - (24*60*60000))}})
+  .then(result => {
+    console.log(result);
+    res.json({"Total order in the last day" : Object.keys(result).length});
+  })
+  .catch(err => console.log(err));
+})
+
 
 
 
