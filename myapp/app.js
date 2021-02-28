@@ -5,6 +5,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
+const axios = require('axios');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const User = require('./models/user');
@@ -184,6 +185,37 @@ app.post('/products', (req, res)=>{
         res.status(400).send(err);
       });
 })
+
+
+app.get('/generate-products', (req, res) => {
+  axios.get('https://fakestoreapi.com/products?limit=3')
+    .then(result => {
+      const resultData = result.data;
+      for(let i=0; i<resultData.length; i++){
+        const product = new Product({
+          title: resultData[i].title,
+          price: resultData[i].price,
+          description: resultData[i].description,
+          category: resultData[i].category,
+          image: resultData[i].image
+        });
+        product.save()
+          .then(result => {
+              //res.json(result);
+              console.log(result);
+          })
+          .catch(err => {
+            res.status(400).send(err);
+          });
+      }
+      console.log(result.data.length);
+      res.json(result.data);
+    })
+    .catch(err => console.log(err));
+})
+
+
+
 
 
 // ORDERS SECTION
