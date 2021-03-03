@@ -1,3 +1,4 @@
+require('dotenv').config();
 const createError = require('http-errors');
 const express = require('express');
 const mongoose = require('mongoose');
@@ -12,12 +13,14 @@ const User = require('./models/user');
 const Product = require('./models/product');
 const Order = require('./models/order');
 
+const {requireAuthUser, requireAuthAdmin, requireAuthSuperAdmin} = require('./middleware/authMiddleware');
+
 const indexRouter = require('./routes/index');
 //const usersRouter = require('./routes/users');
 
 const app = express();
 
-const dbURI = 'mongodb+srv://bayeed123:test1234@cluster0.uv0hb.mongodb.net/orderingDb?retryWrites=true&w=majority';
+const dbURI = `mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@cluster0.uv0hb.mongodb.net/${process.env.DB}?retryWrites=true&w=majority`;
 mongoose.connect(dbURI, {useNewUrlParser:true, useUnifiedTopology:true})
   .then((result) => {
     app.listen(5000);
@@ -51,80 +54,80 @@ const createToken = (id) => {
 
 
 // AUTH MIDDLEWARE
-const requireAuthUser = (req, res, next) => {
-  const token = req.cookies.jwt;
-  if (token){
-    jwt.verify(token, 'a warm cup of tea in a warm afternoon', async (err, decodedToken) => {
-      if (err){
-        console.log("error hase been made");
-      }
-      else {
-        let user = await User.findById(decodedToken.id);
-        //console.log(user.role);
-        if (user.role === 'user') {
-          next();
-        } else {
-          res.status(401).send("error");
-        }
-      }
-    })
-  }
-  else {
-    res.status(401).send("error");
-  }
-}
+// const requireAuthUser = (req, res, next) => {
+//   const token = req.cookies.jwt;
+//   if (token){
+//     jwt.verify(token, 'a warm cup of tea in a warm afternoon', async (err, decodedToken) => {
+//       if (err){
+//         console.log("error hase been made");
+//       }
+//       else {
+//         let user = await User.findById(decodedToken.id);
+//         //console.log(user.role);
+//         if (user.role === 'user') {
+//           next();
+//         } else {
+//           res.status(401).send("error");
+//         }
+//       }
+//     })
+//   }
+//   else {
+//     res.status(401).send("error");
+//   }
+// }
 
-const requireAuthAdmin = (req, res, next) => {
-  const token = req.cookies.jwt;
-  if (token){
-    jwt.verify(token, 'a warm cup of tea in a warm afternoon', async (err, decodedToken) => {
-      if (err){
-        console.log("error hase been made");
-      }
-      else {
-        let user = await User.findById(decodedToken.id);
-        //console.log(user.role);
-        if (user.role === 'admin') {
-          next();
-        } else {
-          res.status(401).send("error");
-        }
-      }
-    })
-  }
-  else {
-    res.status(401).send("error");
-  }
-}
+// const requireAuthAdmin = (req, res, next) => {
+//   const token = req.cookies.jwt;
+//   if (token){
+//     jwt.verify(token, 'a warm cup of tea in a warm afternoon', async (err, decodedToken) => {
+//       if (err){
+//         console.log("error hase been made");
+//       }
+//       else {
+//         let user = await User.findById(decodedToken.id);
+//         //console.log(user.role);
+//         if (user.role === 'admin') {
+//           next();
+//         } else {
+//           res.status(401).send("error");
+//         }
+//       }
+//     })
+//   }
+//   else {
+//     res.status(401).send("error");
+//   }
+// }
 
-const requireAuthSuperAdmin = (req, res, next) => {
-  const token = req.cookies.jwt;
-  if (token){
-    jwt.verify(token, 'a warm cup of tea in a warm afternoon', async (err, decodedToken) => {
-      if (err){
-        console.log("error hase been made");
-      }
-      else {
-        let user = await User.findById(decodedToken.id);
-        //console.log(user.role);
-        if (user.role === 'super admin') {
-          next();
-        } else {
-          res.status(401).send("error");
-        }
-      }
-    })
-  }
-  else {
-    res.status(401).send("error");
-  }
-}
+// const requireAuthSuperAdmin = (req, res, next) => {
+//   const token = req.cookies.jwt;
+//   if (token){
+//     jwt.verify(token, 'a warm cup of tea in a warm afternoon', async (err, decodedToken) => {
+//       if (err){
+//         console.log("error hase been made");
+//       }
+//       else {
+//         let user = await User.findById(decodedToken.id);
+//         //console.log(user.role);
+//         if (user.role === 'super admin') {
+//           next();
+//         } else {
+//           res.status(401).send("error");
+//         }
+//       }
+//     })
+//   }
+//   else {
+//     res.status(401).send("error");
+//   }
+// }
 
 
 
 
 // USERS SECTION
-app.get('/users', requireAuthUser, (req, res) => {
+app.get('/users', (req, res) => {
   User.find()
     .then((result) => res.json(result))
     .catch(err => console.log(err));
