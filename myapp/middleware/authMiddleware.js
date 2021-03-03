@@ -14,7 +14,7 @@ const requireAuthUser = (req, res, next) => {
           if (user.role === 'user') {
             next();
           } else {
-            res.status(401).send("errorss");
+            res.status(401).send("errorssssssss");
           }
         }
       })
@@ -37,7 +37,7 @@ const requireAuthAdmin = (req, res, next) => {
           if (user.role === 'admin') {
             next();
           } else {
-            res.status(401).send("error");
+            res.status(401).send("errorts");
           }
         }
       })

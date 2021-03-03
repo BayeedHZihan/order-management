@@ -16,7 +16,20 @@ const Order = require('./models/order');
 const {requireAuthUser, requireAuthAdmin, requireAuthSuperAdmin} = require('./middleware/authMiddleware');
 
 const indexRouter = require('./routes/index');
-//const usersRouter = require('./routes/users');
+
+const getUsersRouter = require('./routes/userRoutes/getUsers');
+const postUserRouter = require('./routes/userRoutes/postUser');
+const updateUserRouter = require('./routes/userRoutes/updateUser');
+const deleteUserRouter = require('./routes/userRoutes/deleteUser');
+const loginRouter = require('./routes/userRoutes/login');
+const getProductsRouter = require('./routes/productRoutes/getProducts');
+const postProductRouter = require('./routes/productRoutes/postProduct');
+const generateProductsRouter = require('./routes/productRoutes/generateProducts');
+const placeOrderRouter = require('./routes/orderRoutes/placeOrder');
+const changeStatusRouter = require('./routes/orderRoutes/changeStatus');
+const summaryRouter = require('./routes/orderRoutes/summary');
+
+
 
 const app = express();
 
@@ -53,229 +66,40 @@ const createToken = (id) => {
 
 
 
-// AUTH MIDDLEWARE
-// const requireAuthUser = (req, res, next) => {
-//   const token = req.cookies.jwt;
-//   if (token){
-//     jwt.verify(token, 'a warm cup of tea in a warm afternoon', async (err, decodedToken) => {
-//       if (err){
-//         console.log("error hase been made");
-//       }
-//       else {
-//         let user = await User.findById(decodedToken.id);
-//         //console.log(user.role);
-//         if (user.role === 'user') {
-//           next();
-//         } else {
-//           res.status(401).send("error");
-//         }
-//       }
-//     })
-//   }
-//   else {
-//     res.status(401).send("error");
-//   }
-// }
-
-// const requireAuthAdmin = (req, res, next) => {
-//   const token = req.cookies.jwt;
-//   if (token){
-//     jwt.verify(token, 'a warm cup of tea in a warm afternoon', async (err, decodedToken) => {
-//       if (err){
-//         console.log("error hase been made");
-//       }
-//       else {
-//         let user = await User.findById(decodedToken.id);
-//         //console.log(user.role);
-//         if (user.role === 'admin') {
-//           next();
-//         } else {
-//           res.status(401).send("error");
-//         }
-//       }
-//     })
-//   }
-//   else {
-//     res.status(401).send("error");
-//   }
-// }
-
-// const requireAuthSuperAdmin = (req, res, next) => {
-//   const token = req.cookies.jwt;
-//   if (token){
-//     jwt.verify(token, 'a warm cup of tea in a warm afternoon', async (err, decodedToken) => {
-//       if (err){
-//         console.log("error hase been made");
-//       }
-//       else {
-//         let user = await User.findById(decodedToken.id);
-//         //console.log(user.role);
-//         if (user.role === 'super admin') {
-//           next();
-//         } else {
-//           res.status(401).send("error");
-//         }
-//       }
-//     })
-//   }
-//   else {
-//     res.status(401).send("error");
-//   }
-// }
-
-
-
-
 // USERS SECTION
-app.get('/users', (req, res) => {
-  User.find()
-    .then((result) => res.json(result))
-    .catch(err => console.log(err));
-})
 
+app.use('/users', getUsersRouter);
 
-app.post('/users', (req, res)=>{
-  const user = new User(req.body);
-  user.save()
-      .then(result => {
-          res.json(result);
-          console.log(result);
-      })
-      .catch(err => {
-        res.status(400).send(err);
-      });
-})
+app.use('/users', postUserRouter);
 
-app.delete('/users/:id', (req, res) => {
-  const id = req.params.id;
+app.use('/users', deleteUserRouter);
 
-  User.findByIdAndDelete(id)
-  .then(result =>{
-      res.json(result);
-  })
-  .catch(err => {
-    res.status(400).send(err);
-  });
-})
+app.use('/users', updateUserRouter);
 
-
-app.patch('/users/:id', (req, res) => {
-  User.findByIdAndUpdate(req.params.id, req.body, {new: true})
-    .then(result => {
-      if (!result) {
-        return res.status(404).send();
-      }
-      res.send(result);
-    })
-    .catch(err => res.status(500).send(err));
-})
-
-
-app.post('/login', (req, res) => {
-  const {email, password} = req.body;
-  User.login(email, password)
-    .then((user) => {
-      const token = createToken(user._id);
-      res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge*1000});
-      res.status(200).json({user: user._id})
-    })
-    .catch(err => res.status(401).send(err));
-})
+app.use('/login', loginRouter);
 
 
 
 
 // PRODUCTS SECTION
-app.get('/products', requireAuthUser, (req, res) => {
-  Product.find()
-    .then(result => res.json(result))
-    .catch(err => console.log(err));
-})
 
-app.post('/products', (req, res)=>{
-  const product = new Product(req.body);
-  product.save()
-      .then(result => {
-          res.json(result);
-          console.log(result);
-      })
-      .catch(err => {
-        res.status(400).send(err);
-      });
-})
+app.use('/products/view-products', requireAuthUser, getProductsRouter);
 
+app.use('/products', postProductRouter);
 
-app.get('/generate-products', requireAuthSuperAdmin,(req, res) => {
-  axios.get('https://fakestoreapi.com/products?limit=3')
-    .then(result => {
-      const resultData = result.data;
-      for(let i=0; i<resultData.length; i++){
-        const product = new Product({
-          title: resultData[i].title,
-          price: resultData[i].price,
-          description: resultData[i].description,
-          category: resultData[i].category,
-          image: resultData[i].image
-        });
-        product.save()
-          .then(result => {
-              //res.json(result);
-              console.log(result);
-          })
-          .catch(err => {
-            res.status(400).send(err);
-          });
-      }
-      console.log(result.data.length);
-      res.json(result.data);
-    })
-    .catch(err => console.log(err));
-})
+app.use('/generate-products', requireAuthSuperAdmin, generateProductsRouter);
 
 
 
 
 
 // ORDERS SECTION
-app.post('/orders', requireAuthUser, (req, res) => {
-  const order = new Order(req.body);
-  order.save()
-    .then(result => {
-      res.json(result);
-      console.log(result);
-    })
-    .catch(err => res.status(400).send(err));
-})
 
-app.patch('/orders/:id', requireAuthAdmin, (req, res) => {
-  const requestedKeysToUpdate = Object.keys(req.body);
-  if (requestedKeysToUpdate.length!==1 || requestedKeysToUpdate[0]!=='status') {
-    res.status(400).send("Bad Request");
-    return;
-  }
-  Order.findByIdAndUpdate(req.params.id, req.body, {new: true})
-    .then(result => {
-      if (!result) {
-        return res.status(404).send();
-      }
-      res.send(result);
-    })
-    .catch(err => res.status(500).send(err));
-})
+app.use('/orders/change-status', requireAuthAdmin, changeStatusRouter);
 
-app.get('/orders', requireAuthSuperAdmin, (req, res) => {
-  Order.find({createdAt:{ $gte : new Date(Date.now() - (24*60*60000))}})
-  .then(result => {
-    console.log(result);
-    res.json({"Total order in the last day" : Object.keys(result).length});
-  })
-  .catch(err => console.log(err));
-})
+app.use('/orders/summary', requireAuthSuperAdmin, summaryRouter);
 
-
-
-
-
+app.use('/orders/place-order', requireAuthUser, placeOrderRouter);
 
 
 
