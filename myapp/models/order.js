@@ -20,11 +20,8 @@ const orderSchema = new Schema({
     }
 }, {timestamps: true});
 
-// orderSchema.pre('save', (next) => {
-//     this.status = 'pending';
-//     next();
-// });
 
+orderSchema.index({ "createdAt": -1 });
 
 const Order = mongoose.model('Order', orderSchema);
 

@@ -11,15 +11,28 @@ const createToken = (id) => {
   });
 };
 
-router.post('/', (req, res) => {
+// router.post('/', (req, res) => {
+//     const {email, password} = req.body;
+//     User.login(email, password)
+//         .then((user) => {
+//         const token = createToken(user._id);
+//         res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge*1000});
+//         res.status(200).json({user: user._id})
+//         })
+//         .catch(err => res.status(401).send(err));
+// })
+
+router.post('/', async (req, res) => {
+  try{
     const {email, password} = req.body;
-    User.login(email, password)
-        .then((user) => {
-        const token = createToken(user._id);
-        res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge*1000});
-        res.status(200).json({user: user._id})
-        })
-        .catch(err => res.status(401).send(err));
+    const user = await User.login(email, password);
+    const token = await createToken(user._id);
+    res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge*1000});
+    res.status(200).json({user: user._id});
+  } catch ( err ) {
+    res.status(401).send(err)
+  }
+  
 })
 
 module.exports = router;

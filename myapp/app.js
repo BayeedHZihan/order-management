@@ -34,12 +34,19 @@ const summaryRouter = require('./routes/orderRoutes/summary');
 const app = express();
 
 const dbURI = `mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@cluster0.uv0hb.mongodb.net/${process.env.DB}?retryWrites=true&w=majority`;
-mongoose.connect(dbURI, {useNewUrlParser:true, useUnifiedTopology:true})
-  .then((result) => {
-    app.listen(5000);
-    console.log('Connected to db');
-  })
-  .catch(err => console.log(err));
+const connectMongo = async () => {
+  await mongoose.connect(dbURI, {useNewUrlParser:true, useUnifiedTopology:true});
+  app.listen(5000);
+  console.log('Connected to db');
+}
+
+try {
+  connectMongo();
+} catch (err) {
+  console.log(err);
+}
+
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
