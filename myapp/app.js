@@ -29,6 +29,7 @@ const generateProductsRouter = require('./routes/productRoutes/generateProducts'
 const placeOrderRouter = require('./routes/orderRoutes/placeOrder');
 const changeStatusRouter = require('./routes/orderRoutes/changeStatus');
 const summaryRouter = require('./routes/orderRoutes/summary');
+const getOrdersRouter = require('./routes/orderRoutes/getOrders');
 
 
 
@@ -113,7 +114,7 @@ app.use('/orders/summary', requireAuthSuperAdmin, summaryRouter);
 
 app.use('/orders/place-order', requireAuthUser, placeOrderRouter);
 
-
+app.use('/orders/get-orders', requireAuthAdmin, getOrdersRouter);
 
 
 
