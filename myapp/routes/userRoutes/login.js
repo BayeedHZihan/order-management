@@ -28,7 +28,7 @@ router.post('/', async (req, res) => {
     const user = await User.login(email, password);
     const token = await createToken(user._id);
     res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge*1000});
-    res.status(200).json({user: user._id});
+    res.status(200).json({token});
   } catch ( err ) {
     res.status(401).send(err)
   }

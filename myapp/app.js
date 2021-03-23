@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const cors = require('cors');
 
 const axios = require('axios');
 const bodyParser = require('body-parser');
@@ -33,6 +34,8 @@ const summaryRouter = require('./routes/orderRoutes/summary');
 
 const app = express();
 
+
+
 const dbURI = `mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@cluster0.uv0hb.mongodb.net/${process.env.DB}?retryWrites=true&w=majority`;
 const connectMongo = async () => {
   await mongoose.connect(dbURI, {useNewUrlParser:true, useUnifiedTopology:true});
@@ -52,6 +55,8 @@ try {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+//app.use(cors());
+app.use(cors({origin: 'http://localhost:3000'}));
 //app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

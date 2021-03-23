@@ -20,7 +20,7 @@ const requireAuthUser = (req, res, next) => {
       })
     }
     else {
-      res.status(401).send("errors");
+      res.status(402).send("errors");
     }
 }
 
