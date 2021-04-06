@@ -31,7 +31,7 @@ const Product = require('../../models/product');
 // })
 router.get('/', async (req, res) => {
   try {
-    const result = await axios.get('https://fakestoreapi.com/products?limit=3');
+    const result = await axios.get('https://fakestoreapi.com/products');
     const resultData = result.data;
     for(let i=0; i<resultData.length; i++){
       const product = new Product({

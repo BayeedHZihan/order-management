@@ -30,6 +30,7 @@ const placeOrderRouter = require('./routes/orderRoutes/placeOrder');
 const changeStatusRouter = require('./routes/orderRoutes/changeStatus');
 const summaryRouter = require('./routes/orderRoutes/summary');
 const getOrdersRouter = require('./routes/orderRoutes/getOrders');
+const logoutRouter = require('./routes/userRoutes/logout');
 
 
 
@@ -90,6 +91,8 @@ app.use('/users', deleteUserRouter);
 app.use('/users', updateUserRouter);
 
 app.use('/login', loginRouter);
+
+app.use('/logout', logoutRouter);
 
 
 
