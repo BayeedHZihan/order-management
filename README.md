@@ -2,7 +2,7 @@
 
 ## Project Description
 
-E-commerce ish website for user, order, product management with authentication and authorization.
+E-commerce website for user, order, product management with authentication and authorization.
 
 User authentication implemented with json web tokens in cookie. 
 
